@@ -2,56 +2,44 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   ChevronLeft,
   ChevronRight,
-  Maximize2,
-  Minimize2,
   Grid,
   Play,
   Pause,
-  ZoomIn,
-  ZoomOut,
-  Layers,
   Sparkles,
-  Eye,
-  RotateCcw,
-  X
+  Eye
 } from 'lucide-react';
 
 export const SlideCarousel = ({ category }) => {
   const [currentSlide, setCurrentSlide] = useState(1);
   const [viewMode, setViewMode] = useState('carousel'); // 'carousel' | 'grid'
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(1);
   const carouselRef = useRef(null);
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
 
   // Exact 5 slides as requested
   const totalSlides = 5;
-  const currentSlideInfo = category.slides.find((s) => s.number === currentSlide) || category.slides[0];
+  const currentSlideInfo = category.slides?.find((s) => s.number === currentSlide) || category.slides?.[0] || {};
 
-  // Map to src/assets/[category-name]/slide-[1-5].png as required by the user prompt
+  // Map to src/assets/[category-name]/slide-[1-5].png
   const getSlideSrc = (slideNum) => {
-    return `/src/assets/${category.slug}/slide-${slideNum}.png`;
+    return `/src/assets/${category.slug || category.id}/slide-${slideNum}.png`;
   };
 
   const nextSlide = useCallback(() => {
     setImageLoaded(false);
-    setZoomLevel(1);
     setCurrentSlide((prev) => (prev === totalSlides ? 1 : prev + 1));
   }, [totalSlides]);
 
   const prevSlide = useCallback(() => {
     setImageLoaded(false);
-    setZoomLevel(1);
     setCurrentSlide((prev) => (prev === 1 ? totalSlides : prev - 1));
   }, [totalSlides]);
 
   const goToSlide = (slideNum) => {
     if (slideNum !== currentSlide) {
       setImageLoaded(false);
-      setZoomLevel(1);
       setCurrentSlide(slideNum);
     }
   };
@@ -63,25 +51,11 @@ export const SlideCarousel = ({ category }) => {
         nextSlide();
       } else if (e.key === 'ArrowLeft') {
         prevSlide();
-      } else if (e.key === 'Escape' && isFullscreen) {
-        setIsFullscreen(false);
-        setZoomLevel(1);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [nextSlide, prevSlide, isFullscreen]);
-
-  // Lock background scroll when modal is open
-  useEffect(() => {
-    if (isFullscreen) {
-      const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = originalOverflow;
-      };
-    }
-  }, [isFullscreen]);
+  }, [nextSlide, prevSlide]);
 
   // Autoplay functionality
   useEffect(() => {
@@ -115,11 +89,6 @@ export const SlideCarousel = ({ category }) => {
     }
     touchStartX.current = 0;
     touchEndX.current = 0;
-  };
-
-  const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen);
-    setZoomLevel(1);
   };
 
   return (
@@ -183,16 +152,6 @@ export const SlideCarousel = ({ category }) => {
               <span>All 5 Grid</span>
             </button>
           </div>
-
-          {/* Fullscreen Modal trigger */}
-          <button
-            type="button"
-            onClick={toggleFullscreen}
-            className="p-1.5 rounded-lg text-studio-700 hover:bg-studio-100 border border-studio-200 transition-colors"
-            title="Expand Fullscreen"
-          >
-            <Maximize2 className="w-4 h-4" />
-          </button>
         </div>
       </div>
 
@@ -217,7 +176,6 @@ export const SlideCarousel = ({ category }) => {
                 className={`max-w-full max-h-[78vh] object-contain rounded-xl shadow-md transition-all duration-300 ${
                   imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-98'
                 }`}
-                style={{ transform: `scale(${zoomLevel})` }}
               />
 
               {/* Loading Placeholder */}
@@ -257,16 +215,8 @@ export const SlideCarousel = ({ category }) => {
               </span>
               <span className="text-studio-300">|</span>
               <span className="text-xs text-studio-700 font-medium truncate max-w-[220px] sm:max-w-[400px]">
-                {currentSlideInfo.title}
+                {currentSlideInfo.title || category.title}
               </span>
-              <button
-                type="button"
-                onClick={toggleFullscreen}
-                className="text-studio-500 hover:text-burgundy-800 transition-colors ml-1"
-                title="View Full Resolution"
-              >
-                <Maximize2 className="w-3.5 h-3.5" />
-              </button>
             </div>
           </div>
 
@@ -278,16 +228,16 @@ export const SlideCarousel = ({ category }) => {
                   0{currentSlide}
                 </span>
                 <h2 className="text-lg sm:text-xl font-serif font-medium text-studio-950">
-                  {currentSlideInfo.title}
+                  {currentSlideInfo.title || category.title}
                 </h2>
               </div>
               <span className="text-xs font-mono text-studio-400">
-                src/assets/{category.slug}/slide-{currentSlide}.png
+                src/assets/{category.slug || category.id}/slide-{currentSlide}.png
               </span>
             </div>
 
             <p className="text-sm text-studio-700 font-serif leading-relaxed">
-              {currentSlideInfo.description}
+              {currentSlideInfo.description || category.concept}
             </p>
 
             {currentSlideInfo.highlights && (
@@ -354,7 +304,7 @@ export const SlideCarousel = ({ category }) => {
         <div className="space-y-6 animate-fade-in">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5].map((num) => {
-              const slide = category.slides.find((s) => s.number === num) || {};
+              const slide = category.slides?.find((s) => s.number === num) || {};
               return (
                 <div
                   key={num}
@@ -388,180 +338,21 @@ export const SlideCarousel = ({ category }) => {
                   <div className="p-4 space-y-2 flex-1 flex flex-col justify-between bg-white">
                     <div>
                       <h3 className="font-serif text-base font-semibold text-studio-950">
-                        {slide.title}
+                        {slide.title || `${category.title} - Slide ${num}`}
                       </h3>
                       <p className="text-xs text-studio-600 font-serif line-clamp-2 mt-1">
-                        {slide.description}
+                        {slide.description || category.concept}
                       </p>
                     </div>
                     <div className="pt-2 border-t border-studio-100 flex items-center justify-between">
                       <span className="text-[10px] font-mono text-studio-400 truncate">
                         slide-{num}.png
                       </span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          goToSlide(num);
-                          setIsFullscreen(true);
-                        }}
-                        className="p-1 rounded text-studio-600 hover:text-burgundy-900 hover:bg-studio-100"
-                        title="Inspect Fullscreen"
-                      >
-                        <Maximize2 className="w-3.5 h-3.5" />
-                      </button>
                     </div>
                   </div>
                 </div>
               );
             })}
-          </div>
-        </div>
-      )}
-
-      {/* Fullscreen High-Res Modal / Lightbox */}
-      {isFullscreen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Full-screen image viewer"
-          className="fixed inset-0 z-50 bg-studio-950/95 backdrop-blur-2xl flex flex-col animate-fade-in text-white cursor-pointer select-none"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setIsFullscreen(false);
-              setZoomLevel(1);
-            }
-          }}
-        >
-          {/* Prominent Fixed Close Button at Top-Right Corner */}
-          <button
-            type="button"
-            onClick={() => {
-              setIsFullscreen(false);
-              setZoomLevel(1);
-            }}
-            className="fixed top-4 right-4 z-[100] inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-studio-900/90 hover:bg-burgundy-900 text-white border border-white/30 shadow-2xl backdrop-blur-md cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 group focus:outline-none focus:ring-2 focus:ring-white/60"
-            aria-label="Close full-screen image viewer"
-            title="Close viewer (Escape)"
-          >
-            <X className="w-5 h-5 text-white transition-transform group-hover:rotate-90 duration-200" />
-            <span className="font-mono text-xs sm:text-sm font-semibold tracking-wider uppercase text-white">
-              Close
-            </span>
-          </button>
-
-          {/* Modal Top Header */}
-          <div
-            className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/50 pr-32 sm:pr-36 cursor-default"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center gap-3">
-              <span className="px-2 py-0.5 rounded bg-burgundy-700 text-white font-mono text-xs font-semibold">
-                0{currentSlide} / 05
-              </span>
-              <span className="font-serif text-lg font-medium text-white/95">
-                {currentSlideInfo.title}
-              </span>
-              <span className="text-xs text-white/50 font-mono hidden md:inline">
-                ({category.title})
-              </span>
-            </div>
-
-            {/* Modal Controls */}
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setZoomLevel((z) => Math.min(z + 0.25, 2.5))}
-                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
-                title="Zoom In"
-                aria-label="Zoom In"
-              >
-                <ZoomIn className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setZoomLevel((z) => Math.max(z - 0.25, 0.75))}
-                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
-                title="Zoom Out"
-                aria-label="Zoom Out"
-              >
-                <ZoomOut className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setZoomLevel(1)}
-                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
-                title="Reset Zoom"
-                aria-label="Reset Zoom"
-              >
-                <RotateCcw className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Modal Main Stage */}
-          <div
-            className="flex-1 relative flex items-center justify-center p-4 overflow-auto cursor-pointer"
-            onClick={(e) => {
-              if (e.target === e.currentTarget) {
-                setIsFullscreen(false);
-                setZoomLevel(1);
-              }
-            }}
-          >
-            <div
-              className="relative flex items-center justify-center cursor-default max-w-full max-h-full"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <img
-                src={getSlideSrc(currentSlide)}
-                alt={`${category.title} High-Res Slide ${currentSlide}`}
-                className="max-h-[85vh] max-w-full object-contain rounded-lg shadow-2xl transition-transform duration-200"
-                style={{ transform: `scale(${zoomLevel})` }}
-              />
-            </div>
-
-            {/* Large Navigation arrows */}
-            <button
-              type="button"
-              onClick={prevSlide}
-              className="absolute left-6 top-1/2 -translate-y-1/2 p-4 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 transition-all hover:scale-110 cursor-pointer"
-              aria-label="Previous"
-            >
-              <ChevronLeft className="w-7 h-7" />
-            </button>
-            <button
-              type="button"
-              onClick={nextSlide}
-              className="absolute right-6 top-1/2 -translate-y-1/2 p-4 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 transition-all hover:scale-110 cursor-pointer"
-              aria-label="Next"
-            >
-              <ChevronRight className="w-7 h-7" />
-            </button>
-          </div>
-
-          {/* Modal Bottom Thumbnail Strip */}
-          <div
-            className="px-6 py-3 border-t border-white/10 bg-black/50 flex items-center justify-center gap-3 cursor-default"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {[1, 2, 3, 4, 5].map((num) => (
-              <button
-                key={num}
-                type="button"
-                onClick={() => goToSlide(num)}
-                className={`relative rounded-lg overflow-hidden border-2 w-16 h-12 transition-all cursor-pointer ${
-                  num === currentSlide
-                    ? 'border-burgundy-500 scale-105 shadow-glow'
-                    : 'border-white/20 opacity-50 hover:opacity-100'
-                }`}
-              >
-                <img
-                  src={getSlideSrc(num)}
-                  alt={`Slide ${num}`}
-                  className="w-full h-full object-contain bg-white/5"
-                />
-              </button>
-            ))}
           </div>
         </div>
       )}

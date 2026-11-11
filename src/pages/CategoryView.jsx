@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { CATEGORIES } from '../data/categories';
 import {
   Sparkles,
-  Maximize2,
-  Minimize2,
-  ZoomIn,
-  ZoomOut,
-  RotateCcw,
   Download,
   ExternalLink,
   ArrowLeft,
@@ -16,13 +11,10 @@ import {
   Palette,
   CheckCircle2,
   Layers,
-  Scissors,
-  X
+  Scissors
 } from 'lucide-react';
 
 export const CategoryView = ({ category }) => {
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [zoomLevel, setZoomLevel] = useState(1);
   const [showDetails, setShowDetails] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -32,35 +24,10 @@ export const CategoryView = ({ category }) => {
   const nextCategory =
     currentIndex < CATEGORIES.length - 1 ? CATEGORIES[currentIndex + 1] : CATEGORIES[0];
 
-  // Reset zoom on slide change
   useEffect(() => {
     setImageLoaded(false);
-    setZoomLevel(1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [category.id]);
-
-  // Keyboard navigation between categories
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && isFullscreen) {
-        setIsFullscreen(false);
-        setZoomLevel(1);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isFullscreen]);
-
-  // Lock background scroll when modal is open
-  useEffect(() => {
-    if (isFullscreen) {
-      const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = originalOverflow;
-      };
-    }
-  }, [isFullscreen]);
 
   return (
     <div className="min-h-screen pb-20 animate-fade-in">
@@ -117,21 +84,10 @@ export const CategoryView = ({ category }) => {
             <button
               type="button"
               onClick={() => setShowDetails(!showDetails)}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-medium text-studio-800 bg-white hover:bg-studio-100 border border-studio-200/80 shadow-soft transition-all"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-medium text-studio-800 bg-white hover:bg-studio-100 border border-studio-200/80 shadow-soft transition-all cursor-pointer"
             >
               <Info className="w-3.5 h-3.5 text-burgundy-700" />
               <span>{showDetails ? 'Hide Notes' : 'Design Notes'}</span>
-            </button>
-
-            {/* Fullscreen Trigger */}
-            <button
-              type="button"
-              onClick={() => setIsFullscreen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-medium text-white bg-burgundy-900 hover:bg-burgundy-800 shadow-soft transition-all"
-              title="Inspect Full Resolution"
-            >
-              <Maximize2 className="w-3.5 h-3.5" />
-              <span>Fullscreen</span>
             </button>
           </div>
         </div>
@@ -142,35 +98,27 @@ export const CategoryView = ({ category }) => {
             <div className="space-y-3">
               <h3 className="text-xs uppercase tracking-widest font-semibold text-burgundy-900 flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5" />
-                Concept & Philosophy
+                Design Concept & Story
               </h3>
               <p className="text-sm font-serif text-studio-700 leading-relaxed">
                 {category.concept}
               </p>
-              <p className="text-xs font-serif text-studio-600 leading-relaxed">
-                {category.story}
-              </p>
+              {category.story && (
+                <p className="text-xs font-serif italic text-studio-500 border-l-2 border-burgundy-800/40 pl-3 pt-0.5">
+                  "{category.story}"
+                </p>
+              )}
             </div>
 
             <div className="space-y-3">
               <h3 className="text-xs uppercase tracking-widest font-semibold text-burgundy-900 flex items-center gap-1.5">
                 <Scissors className="w-3.5 h-3.5" />
-                Fabrication & Construction Callouts
+                Technical Features & Engineering
               </h3>
-              <div className="flex flex-wrap gap-2">
-                {category.materials?.map((m, idx) => (
-                  <span
-                    key={idx}
-                    className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-studio-100 text-studio-900 text-xs font-mono border border-studio-200"
-                  >
-                    <strong>{m.name}:</strong> {m.spec}
-                  </span>
-                ))}
-              </div>
-              <ul className="space-y-1 text-xs font-serif text-studio-700 pt-1">
-                {category.features?.map((f, idx) => (
-                  <li key={idx} className="flex items-start gap-1.5">
-                    <span className="text-burgundy-700 font-bold">•</span>
+              <ul className="space-y-1.5 text-xs text-studio-700">
+                {category.features?.map((f, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-burgundy-800 shrink-0 mt-0.5" />
                     <span>{f}</span>
                   </li>
                 ))}
@@ -179,11 +127,11 @@ export const CategoryView = ({ category }) => {
           </div>
         )}
 
-        {/* PROMINENT SLIDE DISPLAY CONTAINER (Step 3: w-full h-auto max-w-5xl mx-auto shadow-lg) */}
-        <section className="relative">
-          <div className="w-full h-auto max-w-5xl mx-auto shadow-lg rounded-2xl overflow-hidden border border-studio-200/90 bg-white transition-all duration-300 hover:shadow-2xl">
-            {/* Top Image Stage Toolbar */}
-            <div className="flex items-center justify-between px-5 py-3 bg-studio-100/70 border-b border-studio-200 text-xs">
+        {/* Presentation Slide Showcase */}
+        <section aria-label="Slide Presentation" className="space-y-4">
+          <div className="rounded-3xl overflow-hidden border border-studio-200/90 bg-white shadow-luxury">
+            {/* Top Image Bar */}
+            <div className="flex items-center justify-between px-6 py-3 bg-studio-100/70 border-b border-studio-200 text-xs">
               <div className="flex items-center gap-2">
                 <span className="font-mono font-bold px-2 py-0.5 rounded bg-burgundy-900 text-white text-[11px]">
                   PAGE {category.pageNumber}
@@ -195,14 +143,6 @@ export const CategoryView = ({ category }) => {
 
               <div className="flex items-center gap-3 text-studio-500 font-mono text-[11px]">
                 <span className="hidden md:inline">src/assets/{category.imageFilename}</span>
-                <button
-                  type="button"
-                  onClick={() => setIsFullscreen(true)}
-                  className="inline-flex items-center gap-1 text-burgundy-800 hover:text-burgundy-950 font-medium font-sans"
-                >
-                  <Maximize2 className="w-3.5 h-3.5" />
-                  <span>Inspect</span>
-                </button>
               </div>
             </div>
 
@@ -249,14 +189,6 @@ export const CategoryView = ({ category }) => {
                   <ExternalLink className="w-3.5 h-3.5" />
                   <span>Open Raw File</span>
                 </a>
-                <button
-                  type="button"
-                  onClick={() => setIsFullscreen(true)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-burgundy-900 hover:bg-burgundy-800 text-white font-medium transition-colors"
-                >
-                  <Maximize2 className="w-3.5 h-3.5" />
-                  <span>Zoom / Fullscreen</span>
-                </button>
               </div>
             </div>
           </div>
@@ -305,122 +237,6 @@ export const CategoryView = ({ category }) => {
           </div>
         </nav>
       </main>
-
-      {/* Fullscreen High-Resolution Lightbox Modal */}
-      {isFullscreen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Full-screen image viewer"
-          className="fixed inset-0 z-50 bg-studio-950/95 backdrop-blur-2xl flex flex-col animate-fade-in text-white cursor-pointer select-none"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setIsFullscreen(false);
-              setZoomLevel(1);
-            }
-          }}
-        >
-          {/* Prominent Fixed Close Button at Top-Right Corner */}
-          <button
-            type="button"
-            onClick={() => {
-              setIsFullscreen(false);
-              setZoomLevel(1);
-            }}
-            className="fixed top-4 right-4 z-[100] inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-studio-900/90 hover:bg-burgundy-900 text-white border border-white/30 shadow-2xl backdrop-blur-md cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 group focus:outline-none focus:ring-2 focus:ring-white/60"
-            aria-label="Close full-screen image viewer"
-            title="Close viewer (Escape)"
-          >
-            <X className="w-5 h-5 text-white transition-transform group-hover:rotate-90 duration-200" />
-            <span className="font-mono text-xs sm:text-sm font-semibold tracking-wider uppercase text-white">
-              Close
-            </span>
-          </button>
-
-          {/* Modal Header */}
-          <div
-            className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/50 pr-32 sm:pr-36 cursor-default"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center gap-3">
-              <span className="px-2.5 py-0.5 rounded bg-burgundy-700 text-white font-mono text-xs font-semibold">
-                Page {category.pageNumber} / 05
-              </span>
-              <span className="font-serif text-lg font-medium text-white/95">
-                {category.title}
-              </span>
-              <span className="text-xs text-white/50 font-mono hidden md:inline">
-                ({category.imageFilename})
-              </span>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setZoomLevel((z) => Math.min(z + 0.25, 2.5))}
-                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
-                title="Zoom In"
-                aria-label="Zoom In"
-              >
-                <ZoomIn className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setZoomLevel((z) => Math.max(z - 0.25, 0.75))}
-                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
-                title="Zoom Out"
-                aria-label="Zoom Out"
-              >
-                <ZoomOut className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setZoomLevel(1)}
-                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
-                title="Reset Zoom"
-                aria-label="Reset Zoom"
-              >
-                <RotateCcw className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Modal Main Stage with Scroll & Zoom */}
-          <div
-            className="flex-1 relative overflow-auto p-4 flex items-center justify-center cursor-pointer"
-            onClick={(e) => {
-              if (e.target === e.currentTarget) {
-                setIsFullscreen(false);
-                setZoomLevel(1);
-              }
-            }}
-          >
-            <div
-              className="relative flex items-center justify-center cursor-default max-w-full max-h-full"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <img
-                src={category.image}
-                alt={category.title}
-                className="max-w-none transition-transform duration-200 shadow-2xl rounded-lg"
-                style={{
-                  width: `${zoomLevel * 100}%`,
-                  maxWidth: zoomLevel <= 1 ? '100%' : 'none',
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Modal Bottom Strip */}
-          <div
-            className="px-6 py-3 border-t border-white/10 bg-black/50 flex items-center justify-between text-xs text-white/60 cursor-default"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <span>Use mouse wheel or zoom buttons to inspect technical callouts</span>
-            <span className="font-mono">Zoom: {Math.round(zoomLevel * 100)}%</span>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -2,27 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { PART_B_SLIDES } from '../data/partB';
 import {
-  Maximize2,
-  ZoomIn,
-  ZoomOut,
-  RotateCcw,
   ArrowUp,
   ChevronDown,
   ExternalLink,
-  ArrowRight,
-  X
+  ArrowRight
 } from 'lucide-react';
 
 export const PartBPage = () => {
-  const [selectedSlide, setSelectedSlide] = useState(null);
-  const [zoomLevel, setZoomLevel] = useState(1);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
-
-  const closeModal = () => {
-    setSelectedSlide(null);
-    setZoomLevel(1);
-  };
 
   // Monitor scroll for back-to-top button and progress indicator
   useEffect(() => {
@@ -45,35 +33,6 @@ export const PartBPage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Lock background scroll when modal is open
-  useEffect(() => {
-    if (selectedSlide) {
-      const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = originalOverflow;
-      };
-    }
-  }, [selectedSlide]);
-
-  // Keyboard navigation for modal (Escape to close, Left/Right arrows to flip)
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (!selectedSlide) return;
-      if (e.key === 'Escape') {
-        closeModal();
-      } else if (e.key === 'ArrowRight') {
-        setSelectedSlide((prev) => (prev < PART_B_SLIDES.length ? prev + 1 : 1));
-        setZoomLevel(1);
-      } else if (e.key === 'ArrowLeft') {
-        setSelectedSlide((prev) => (prev > 1 ? prev - 1 : PART_B_SLIDES.length));
-        setZoomLevel(1);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedSlide]);
-
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -89,10 +48,6 @@ export const PartBPage = () => {
       });
     }
   };
-
-  const currentModalSlide = selectedSlide
-    ? PART_B_SLIDES.find((s) => s.number === selectedSlide)
-    : null;
 
   return (
     <div className="min-h-screen pb-24 animate-fade-in bg-studio-50">
@@ -164,18 +119,6 @@ export const PartBPage = () => {
                 <span className="hidden md:inline font-mono text-[11px] text-studio-400">
                   src/assets/part-b/slide-{slide.originalSlideNumber}.png
                 </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedSlide(slide.number);
-                    setZoomLevel(1);
-                  }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium text-studio-700 hover:text-burgundy-950 bg-white hover:bg-studio-100 border border-studio-200/80 transition-all shadow-xs cursor-pointer"
-                  title="Inspect Fullscreen"
-                >
-                  <Maximize2 className="w-3.5 h-3.5 text-burgundy-800" />
-                  <span>Inspect</span>
-                </button>
               </div>
             </header>
 
@@ -186,11 +129,7 @@ export const PartBPage = () => {
                 alt={slide.alt}
                 loading="lazy"
                 decoding="async"
-                className="w-full h-auto object-contain block rounded-xl shadow-xs group-hover:scale-[1.005] transition-transform duration-300 cursor-zoom-in"
-                onClick={() => {
-                  setSelectedSlide(slide.number);
-                  setZoomLevel(1);
-                }}
+                className="w-full h-auto object-contain block rounded-xl shadow-xs group-hover:scale-[1.005] transition-transform duration-300"
               />
             </div>
 
@@ -257,142 +196,6 @@ export const PartBPage = () => {
         >
           <ArrowUp className="w-5 h-5" />
         </button>
-      )}
-
-      {/* Fullscreen High-Resolution Modal / Lightbox */}
-      {selectedSlide && currentModalSlide && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Full-screen image viewer"
-          className="fixed inset-0 z-50 bg-studio-950/95 backdrop-blur-2xl flex flex-col animate-fade-in text-white cursor-pointer select-none"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              closeModal();
-            }
-          }}
-        >
-          {/* Prominent Fixed Close Button at Top-Right Corner */}
-          <button
-            type="button"
-            onClick={closeModal}
-            className="fixed top-4 right-4 z-[100] inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-studio-900/90 hover:bg-burgundy-900 text-white border border-white/30 shadow-2xl backdrop-blur-md cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 group focus:outline-none focus:ring-2 focus:ring-white/60"
-            aria-label="Close full-screen image viewer"
-            title="Close viewer (Escape)"
-          >
-            <X className="w-5 h-5 text-white transition-transform group-hover:rotate-90 duration-200" />
-            <span className="font-mono text-xs sm:text-sm font-semibold tracking-wider uppercase text-white">
-              Close
-            </span>
-          </button>
-
-          {/* Modal Header Bar */}
-          <div
-            className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/50 pr-32 sm:pr-36 cursor-default"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center gap-3">
-              <span className="px-2.5 py-0.5 rounded bg-burgundy-700 text-white font-mono text-xs font-semibold">
-                Page {currentModalSlide.number} / {PART_B_SLIDES.length}
-              </span>
-              <span className="font-serif text-base sm:text-lg font-medium text-white/95 truncate max-w-[200px] sm:max-w-md">
-                Saint Roman Part B Presentation
-              </span>
-              <span className="text-xs text-white/50 font-mono hidden md:inline">
-                (slide-{currentModalSlide.originalSlideNumber}.png)
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2 sm:gap-3">
-              <button
-                type="button"
-                onClick={() => setZoomLevel((z) => Math.min(z + 0.25, 2.5))}
-                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
-                title="Zoom In"
-                aria-label="Zoom In"
-              >
-                <ZoomIn className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setZoomLevel((z) => Math.max(z - 0.25, 0.75))}
-                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
-                title="Zoom Out"
-                aria-label="Zoom Out"
-              >
-                <ZoomOut className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setZoomLevel(1)}
-                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
-                title="Reset Zoom"
-                aria-label="Reset Zoom"
-              >
-                <RotateCcw className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Modal Main Stage with dark overlay click-to-exit */}
-          <div
-            className="flex-1 relative overflow-auto p-4 flex items-center justify-center cursor-pointer"
-            onClick={(e) => {
-              if (e.target === e.currentTarget) {
-                closeModal();
-              }
-            }}
-          >
-            <div
-              className="relative flex items-center justify-center cursor-default max-w-full max-h-full"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <img
-                src={currentModalSlide.src}
-                alt={currentModalSlide.alt}
-                className="max-w-none transition-transform duration-200 shadow-2xl rounded-lg"
-                style={{
-                  width: `${zoomLevel * 100}%`,
-                  maxWidth: zoomLevel <= 1 ? '100%' : 'none',
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Modal Footer Strip with Direct Jump */}
-          <div
-            className="px-6 py-3 border-t border-white/10 bg-black/50 flex items-center justify-between text-xs text-white/70 cursor-default"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              type="button"
-              disabled={selectedSlide <= 1}
-              onClick={() => {
-                setSelectedSlide((s) => Math.max(s - 1, 1));
-                setZoomLevel(1);
-              }}
-              className="px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer font-medium"
-            >
-              ← Previous Page
-            </button>
-
-            <span className="font-mono text-center">
-              Page {currentModalSlide.number} of {PART_B_SLIDES.length} • Zoom: {Math.round(zoomLevel * 100)}%
-            </span>
-
-            <button
-              type="button"
-              disabled={selectedSlide >= PART_B_SLIDES.length}
-              onClick={() => {
-                setSelectedSlide((s) => Math.min(s + 1, PART_B_SLIDES.length));
-                setZoomLevel(1);
-              }}
-              className="px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer font-medium"
-            >
-              Next Page →
-            </button>
-          </div>
-        </div>
       )}
     </div>
   );
