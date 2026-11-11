@@ -50,7 +50,7 @@ export const CATEGORIES = [
     image: slide2,
     imageFilename: 'slide-2.png',
     concept: 'Inspired by the energy of movement and the calmness of nature, this collection combines functional support with contemporary style. Bold Tyrian Purple, vibrant Citron and soft Sage Green create a dynamic colour story, while breathable stretch fabrics and lightweight layering ensure comfort, flexibility and support during high-impact activities.',
-    story: 'Inspired by the warmth of natural skin, soft sunlight, and delicate organic textures. A calm, timeless palette expresses effortless comfort and functional luxury.',
+    story: 'AUREVÉ celebrates the harmony of movement and stillness, blending vibrant colours, soft textures and functional designs. Inspired by nature, it empowers women to move freely with comfort, confidence and effortless style.',
     palette: [
       { name: 'Tyrian Purple', hex: '#66023C' },
       { name: 'Citron', hex: '#D7E04A' },
