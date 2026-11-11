@@ -52,33 +52,6 @@ export const CategoryView = ({ category }) => {
 
   return (
     <div className="min-h-screen pb-20 animate-fade-in">
-      {/* Category Navigation Pills Strip */}
-      <div className="border-b border-studio-200/70 bg-studio-100/40 py-3">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none no-scrollbar">
-            <span className="text-[11px] font-mono uppercase text-studio-400 tracking-wider flex-shrink-0 mr-1">
-              Select Category:
-            </span>
-            {CATEGORIES.map((c) => (
-              <NavLink
-                key={c.id}
-                to={c.path}
-                className={({ isActive }) =>
-                  `flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 flex items-center gap-2 border ${
-                    isActive
-                      ? 'bg-burgundy-900 text-white border-burgundy-900 shadow-sm font-semibold'
-                      : 'bg-white text-studio-700 hover:bg-studio-100 border-studio-200 hover:border-studio-300'
-                  }`
-                }
-              >
-                <span className="font-mono text-[10px] opacity-75">{c.slideNumber}</span>
-                <span>{c.label}</span>
-              </NavLink>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
         {/* Category Editorial Header */}

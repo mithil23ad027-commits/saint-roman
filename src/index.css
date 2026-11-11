@@ -63,3 +63,13 @@
 .tracking-widest-luxury {
   letter-spacing: 0.28em;
 }
+
+/* Hide scrollbars for sub-navigation tabs */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { Navbar } from './components/Navbar';
+import { GlobalHeader } from './components/GlobalHeader';
+import { PartASubNav } from './components/PartASubNav';
 import { Footer } from './components/Footer';
 import { CategoryView } from './pages/CategoryView';
 import { PartBPage } from './pages/PartBPage';
@@ -19,12 +20,29 @@ function ScrollToTop() {
 
 export function App() {
   const [cat1, cat2, cat3, cat4, cat5] = CATEGORIES;
+  const location = useLocation();
+
+  // Part A valid routes
+  const partAPaths = [
+    '/',
+    '/everyday-basics',
+    '/activewear',
+    '/loungewear',
+    '/full-coverage',
+    '/multiway-styling',
+  ];
+
+  const isPartA = partAPaths.includes(location.pathname);
 
   return (
     <div className="flex flex-col min-h-screen bg-studio-50 text-studio-950 font-sans selection:bg-burgundy-900 selection:text-white">
       <ScrollToTop />
-      {/* Sticky, modern navigation bar with prominent Part B link */}
-      <Navbar />
+
+      {/* Single Global Sticky Header */}
+      <GlobalHeader />
+
+      {/* Dedicated Secondary Sub-Navigation — ONLY renders inside Part A routes */}
+      {isPartA && <PartASubNav />}
 
       {/* Main Routed Views */}
       <div className="flex-1">

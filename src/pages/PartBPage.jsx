@@ -2,17 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { PART_B_SLIDES } from '../data/partB';
 import {
-  Sparkles,
   Maximize2,
   Minimize2,
   ZoomIn,
   ZoomOut,
   RotateCcw,
   ArrowUp,
-  Layers,
   ChevronDown,
   ExternalLink,
-  BookOpen,
   ArrowRight
 } from 'lucide-react';
 
@@ -69,7 +66,7 @@ export const PartBPage = () => {
   const scrollToSlide = (slideNum) => {
     const element = document.getElementById(`slide-${slideNum}`);
     if (element) {
-      const navbarOffset = 100;
+      const navbarOffset = 76; // 64px global header + 12px margin
       const elementPosition = element.getBoundingClientRect().top + window.scrollY;
       window.scrollTo({
         top: elementPosition - navbarOffset,
@@ -85,69 +82,43 @@ export const PartBPage = () => {
   return (
     <div className="min-h-screen pb-24 animate-fade-in bg-studio-50">
       {/* Scroll Progress Bar */}
-      <div className="fixed top-20 left-0 w-full h-1 bg-studio-200/80 z-40">
+      <div className="fixed top-16 left-0 w-full h-1 bg-studio-200/80 z-40">
         <div
           className="h-full bg-burgundy-900 transition-all duration-150"
           style={{ width: `${scrollProgress}%` }}
         />
       </div>
 
-      {/* Part B Editorial Hero Header */}
-      <section className="border-b border-studio-200/80 bg-gradient-to-b from-studio-100/70 via-studio-50 to-white pt-10 pb-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-            <div className="space-y-3 max-w-3xl">
-              <div className="flex flex-wrap items-center gap-2.5">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-burgundy-900 text-white text-xs font-mono font-bold tracking-wider uppercase shadow-xs">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  Portfolio Part B
-                </span>
-                <span className="text-xs uppercase tracking-widest text-studio-500 font-medium">
-                  23 Pages • Continuous Presentation Deck
-                </span>
-              </div>
+      {/* Part B Header: Clean, minimal title with quick jump */}
+      <section className="border-b border-studio-200/80 bg-studio-100/50 pt-8 pb-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-medium text-studio-950 tracking-tight">
+              Saint Roman Comprehensive Portfolio
+            </h1>
+            <p className="text-xs sm:text-sm font-serif text-studio-600 mt-1">
+              23 Pages • Continuous Presentation Deck
+            </p>
+          </div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-medium text-studio-950 tracking-tight leading-tight">
-                Saint Roman Comprehensive Portfolio
-              </h1>
-
-              <p className="text-sm sm:text-base font-serif text-studio-700 max-w-2xl leading-relaxed">
-                A seamless, full-length presentation of all 23 collection pages. Scroll continuously
-                through moodboards, color stories, technical design packs, fabric weights, and campaign photography.
-              </p>
-            </div>
-
-            {/* Quick Actions & Slide Jump Dropdown */}
-            <div className="flex flex-wrap items-center gap-3 lg:self-end">
-              {/* Quick Jump Dropdown */}
-              <div className="relative group">
-                <select
-                  onChange={(e) => scrollToSlide(Number(e.target.value))}
-                  defaultValue=""
-                  aria-label="Jump directly to a slide in the Part B presentation"
-                  className="appearance-none glass-card pl-4 pr-10 py-2.5 rounded-2xl text-xs font-mono font-medium text-studio-800 bg-white hover:bg-studio-100 border border-studio-200/90 shadow-soft cursor-pointer focus:outline-none focus:ring-2 focus:ring-burgundy-900"
-                >
-                  <option value="" disabled>
-                    Jump to Slide (1 - 23)...
-                  </option>
-                  {PART_B_SLIDES.map((slide) => (
-                    <option key={slide.number} value={slide.number}>
-                      Page {slide.formattedNumber} of 23
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="w-4 h-4 text-studio-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-              </div>
-
-              {/* Link to Part A */}
-              <Link
-                to="/everyday-basics"
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-xs font-medium text-studio-700 hover:text-burgundy-900 bg-studio-100 hover:bg-studio-200/70 border border-studio-200 transition-all shadow-xs"
-              >
-                <Layers className="w-3.5 h-3.5 text-burgundy-800" />
-                <span>Switch to Part A (5 Sets)</span>
-              </Link>
-            </div>
+          {/* Quick Jump Dropdown */}
+          <div className="relative group self-start sm:self-auto">
+            <select
+              onChange={(e) => scrollToSlide(Number(e.target.value))}
+              defaultValue=""
+              aria-label="Jump directly to a slide in the Part B presentation"
+              className="appearance-none glass-card pl-4 pr-10 py-2 rounded-xl text-xs font-mono font-medium text-studio-800 bg-white hover:bg-studio-100 border border-studio-200/90 shadow-soft cursor-pointer focus:outline-none focus:ring-2 focus:ring-burgundy-900"
+            >
+              <option value="" disabled>
+                Jump to Slide (1 - 23)...
+              </option>
+              {PART_B_SLIDES.map((slide) => (
+                <option key={slide.number} value={slide.number}>
+                  Page {slide.formattedNumber} of 23
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="w-4 h-4 text-studio-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
         </div>
       </section>
