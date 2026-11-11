@@ -16,7 +16,8 @@ import {
   Palette,
   CheckCircle2,
   Layers,
-  Scissors
+  Scissors,
+  X
 } from 'lucide-react';
 
 export const CategoryView = ({ category }) => {
@@ -48,6 +49,17 @@ export const CategoryView = ({ category }) => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullscreen]);
+
+  // Lock background scroll when modal is open
+  useEffect(() => {
+    if (isFullscreen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
   }, [isFullscreen]);
 
   return (
@@ -296,9 +308,40 @@ export const CategoryView = ({ category }) => {
 
       {/* Fullscreen High-Resolution Lightbox Modal */}
       {isFullscreen && (
-        <div className="fixed inset-0 z-50 bg-studio-950/95 backdrop-blur-2xl flex flex-col animate-fade-in text-white">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Full-screen image viewer"
+          className="fixed inset-0 z-50 bg-studio-950/95 backdrop-blur-2xl flex flex-col animate-fade-in text-white cursor-pointer select-none"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setIsFullscreen(false);
+              setZoomLevel(1);
+            }
+          }}
+        >
+          {/* Prominent Fixed Close Button at Top-Right Corner */}
+          <button
+            type="button"
+            onClick={() => {
+              setIsFullscreen(false);
+              setZoomLevel(1);
+            }}
+            className="fixed top-4 right-4 z-[100] inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-studio-900/90 hover:bg-burgundy-900 text-white border border-white/30 shadow-2xl backdrop-blur-md cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 group focus:outline-none focus:ring-2 focus:ring-white/60"
+            aria-label="Close full-screen image viewer"
+            title="Close viewer (Escape)"
+          >
+            <X className="w-5 h-5 text-white transition-transform group-hover:rotate-90 duration-200" />
+            <span className="font-mono text-xs sm:text-sm font-semibold tracking-wider uppercase text-white">
+              Close
+            </span>
+          </button>
+
           {/* Modal Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/40">
+          <div
+            className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/50 pr-32 sm:pr-36 cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center gap-3">
               <span className="px-2.5 py-0.5 rounded bg-burgundy-700 text-white font-mono text-xs font-semibold">
                 Page {category.pageNumber} / 05
@@ -315,56 +358,64 @@ export const CategoryView = ({ category }) => {
               <button
                 type="button"
                 onClick={() => setZoomLevel((z) => Math.min(z + 0.25, 2.5))}
-                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
                 title="Zoom In"
+                aria-label="Zoom In"
               >
                 <ZoomIn className="w-4 h-4" />
               </button>
               <button
                 type="button"
                 onClick={() => setZoomLevel((z) => Math.max(z - 0.25, 0.75))}
-                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
                 title="Zoom Out"
+                aria-label="Zoom Out"
               >
                 <ZoomOut className="w-4 h-4" />
               </button>
               <button
                 type="button"
                 onClick={() => setZoomLevel(1)}
-                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
                 title="Reset Zoom"
+                aria-label="Reset Zoom"
               >
                 <RotateCcw className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsFullscreen(false);
-                  setZoomLevel(1);
-                }}
-                className="p-2 rounded-lg bg-burgundy-800 hover:bg-burgundy-700 transition-colors"
-                title="Close"
-              >
-                <Minimize2 className="w-4 h-4" />
               </button>
             </div>
           </div>
 
           {/* Modal Main Stage with Scroll & Zoom */}
-          <div className="flex-1 relative overflow-auto p-4 flex items-center justify-center">
-            <img
-              src={category.image}
-              alt={category.title}
-              className="max-w-none transition-transform duration-200 shadow-2xl rounded-lg"
-              style={{
-                width: `${zoomLevel * 100}%`,
-                maxWidth: zoomLevel <= 1 ? '100%' : 'none',
-              }}
-            />
+          <div
+            className="flex-1 relative overflow-auto p-4 flex items-center justify-center cursor-pointer"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setIsFullscreen(false);
+                setZoomLevel(1);
+              }
+            }}
+          >
+            <div
+              className="relative flex items-center justify-center cursor-default max-w-full max-h-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img
+                src={category.image}
+                alt={category.title}
+                className="max-w-none transition-transform duration-200 shadow-2xl rounded-lg"
+                style={{
+                  width: `${zoomLevel * 100}%`,
+                  maxWidth: zoomLevel <= 1 ? '100%' : 'none',
+                }}
+              />
+            </div>
           </div>
 
           {/* Modal Bottom Strip */}
-          <div className="px-6 py-3 border-t border-white/10 bg-black/40 flex items-center justify-between text-xs text-white/60">
+          <div
+            className="px-6 py-3 border-t border-white/10 bg-black/50 flex items-center justify-between text-xs text-white/60 cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          >
             <span>Use mouse wheel or zoom buttons to inspect technical callouts</span>
             <span className="font-mono">Zoom: {Math.round(zoomLevel * 100)}%</span>
           </div>

@@ -3,14 +3,14 @@ import { Link } from 'react-router-dom';
 import { PART_B_SLIDES } from '../data/partB';
 import {
   Maximize2,
-  Minimize2,
   ZoomIn,
   ZoomOut,
   RotateCcw,
   ArrowUp,
   ChevronDown,
   ExternalLink,
-  ArrowRight
+  ArrowRight,
+  X
 } from 'lucide-react';
 
 export const PartBPage = () => {
@@ -18,6 +18,11 @@ export const PartBPage = () => {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+
+  const closeModal = () => {
+    setSelectedSlide(null);
+    setZoomLevel(1);
+  };
 
   // Monitor scroll for back-to-top button and progress indicator
   useEffect(() => {
@@ -40,18 +45,28 @@ export const PartBPage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Keyboard navigation for modal
+  // Lock background scroll when modal is open
+  useEffect(() => {
+    if (selectedSlide) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [selectedSlide]);
+
+  // Keyboard navigation for modal (Escape to close, Left/Right arrows to flip)
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!selectedSlide) return;
       if (e.key === 'Escape') {
-        setSelectedSlide(null);
-        setZoomLevel(1);
+        closeModal();
       } else if (e.key === 'ArrowRight') {
-        setSelectedSlide((prev) => (prev < 23 ? prev + 1 : 1));
+        setSelectedSlide((prev) => (prev < PART_B_SLIDES.length ? prev + 1 : 1));
         setZoomLevel(1);
       } else if (e.key === 'ArrowLeft') {
-        setSelectedSlide((prev) => (prev > 1 ? prev - 1 : 23));
+        setSelectedSlide((prev) => (prev > 1 ? prev - 1 : PART_B_SLIDES.length));
         setZoomLevel(1);
       }
     };
@@ -97,7 +112,7 @@ export const PartBPage = () => {
               Saint Roman Comprehensive Portfolio
             </h1>
             <p className="text-xs sm:text-sm font-serif text-studio-600 mt-1">
-              23 Pages • Continuous Presentation Deck
+              {PART_B_SLIDES.length} Pages • Continuous Presentation Deck
             </p>
           </div>
 
@@ -110,11 +125,11 @@ export const PartBPage = () => {
               className="appearance-none glass-card pl-4 pr-10 py-2 rounded-xl text-xs font-mono font-medium text-studio-800 bg-white hover:bg-studio-100 border border-studio-200/90 shadow-soft cursor-pointer focus:outline-none focus:ring-2 focus:ring-burgundy-900"
             >
               <option value="" disabled>
-                Jump to Slide (1 - 23)...
+                Jump to Page (1 - {PART_B_SLIDES.length})...
               </option>
               {PART_B_SLIDES.map((slide) => (
                 <option key={slide.number} value={slide.number}>
-                  Page {slide.formattedNumber} of 23
+                  Page {slide.number} of {PART_B_SLIDES.length}
                 </option>
               ))}
             </select>
@@ -123,7 +138,7 @@ export const PartBPage = () => {
         </div>
       </section>
 
-      {/* CONTINUOUS SCROLL COLUMN: 23 SLIDES SEQUENTIALLY FROM TOP TO BOTTOM */}
+      {/* CONTINUOUS SCROLL COLUMN: 10 SLIDES SEQUENTIALLY FROM TOP TO BOTTOM */}
       <main className="flex flex-col gap-8 md:gap-16 items-center w-full max-w-5xl mx-auto py-10 px-4 sm:px-6">
         {PART_B_SLIDES.map((slide) => (
           <article
@@ -135,19 +150,19 @@ export const PartBPage = () => {
             <header className="flex items-center justify-between px-5 py-3 bg-studio-100/70 border-b border-studio-200 text-xs">
               <div className="flex items-center gap-2.5">
                 <span className="font-mono font-bold px-2.5 py-0.5 rounded bg-burgundy-900 text-white text-[11px] shadow-xs">
-                  PAGE {slide.formattedNumber}
+                  PAGE {slide.number}
                 </span>
                 <span className="font-serif font-medium text-studio-800">
                   Saint Roman Presentation
                 </span>
                 <span className="text-studio-400 font-mono text-[11px] hidden sm:inline">
-                  • 0{slide.number} / 23
+                  • Page {slide.number} of {PART_B_SLIDES.length}
                 </span>
               </div>
 
               <div className="flex items-center gap-3">
                 <span className="hidden md:inline font-mono text-[11px] text-studio-400">
-                  src/assets/part-b/slide-{slide.number}.png
+                  src/assets/part-b/slide-{slide.originalSlideNumber}.png
                 </span>
                 <button
                   type="button"
@@ -155,7 +170,7 @@ export const PartBPage = () => {
                     setSelectedSlide(slide.number);
                     setZoomLevel(1);
                   }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium text-studio-700 hover:text-burgundy-950 bg-white hover:bg-studio-100 border border-studio-200/80 transition-all shadow-xs"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium text-studio-700 hover:text-burgundy-950 bg-white hover:bg-studio-100 border border-studio-200/80 transition-all shadow-xs cursor-pointer"
                   title="Inspect Fullscreen"
                 >
                   <Maximize2 className="w-3.5 h-3.5 text-burgundy-800" />
@@ -184,7 +199,7 @@ export const PartBPage = () => {
               <div className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-burgundy-800" />
                 <span className="font-mono text-[11px]">
-                  Slide {slide.formattedNumber} of 23
+                  Page {slide.number} of {PART_B_SLIDES.length}
                 </span>
               </div>
 
@@ -206,7 +221,7 @@ export const PartBPage = () => {
         {/* End of Presentation Banner */}
         <div className="w-full text-center py-12 border-t border-studio-200/80 space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-studio-200/80 text-studio-700 text-xs font-mono">
-            <span>✓ All 23 Pages Completed</span>
+            <span>✓ All {PART_B_SLIDES.length} Pages Completed</span>
           </div>
           <h2 className="text-2xl font-serif font-medium text-studio-950">
             End of Part B Presentation
@@ -215,7 +230,7 @@ export const PartBPage = () => {
             <button
               type="button"
               onClick={scrollToTop}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-burgundy-900 hover:bg-burgundy-800 text-white font-medium text-xs shadow-soft transition-all"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-burgundy-900 hover:bg-burgundy-800 text-white font-medium text-xs shadow-soft transition-all cursor-pointer"
             >
               <ArrowUp className="w-3.5 h-3.5" />
               <span>Back to Top</span>
@@ -236,7 +251,7 @@ export const PartBPage = () => {
         <button
           type="button"
           onClick={scrollToTop}
-          className="fixed bottom-6 right-6 p-3.5 rounded-full bg-burgundy-900 text-white shadow-floating hover:bg-burgundy-800 transition-all duration-200 hover:scale-110 active:scale-95 z-40 focus:outline-none"
+          className="fixed bottom-6 right-6 p-3.5 rounded-full bg-burgundy-900 text-white shadow-floating hover:bg-burgundy-800 transition-all duration-200 hover:scale-110 active:scale-95 z-40 focus:outline-none cursor-pointer"
           title="Back to Top"
           aria-label="Back to Top"
         >
@@ -246,18 +261,45 @@ export const PartBPage = () => {
 
       {/* Fullscreen High-Resolution Modal / Lightbox */}
       {selectedSlide && currentModalSlide && (
-        <div className="fixed inset-0 z-50 bg-studio-950/95 backdrop-blur-2xl flex flex-col animate-fade-in text-white">
-          {/* Modal Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/40">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Full-screen image viewer"
+          className="fixed inset-0 z-50 bg-studio-950/95 backdrop-blur-2xl flex flex-col animate-fade-in text-white cursor-pointer select-none"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              closeModal();
+            }
+          }}
+        >
+          {/* Prominent Fixed Close Button at Top-Right Corner */}
+          <button
+            type="button"
+            onClick={closeModal}
+            className="fixed top-4 right-4 z-[100] inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-studio-900/90 hover:bg-burgundy-900 text-white border border-white/30 shadow-2xl backdrop-blur-md cursor-pointer transition-all duration-200 hover:scale-105 active:scale-95 group focus:outline-none focus:ring-2 focus:ring-white/60"
+            aria-label="Close full-screen image viewer"
+            title="Close viewer (Escape)"
+          >
+            <X className="w-5 h-5 text-white transition-transform group-hover:rotate-90 duration-200" />
+            <span className="font-mono text-xs sm:text-sm font-semibold tracking-wider uppercase text-white">
+              Close
+            </span>
+          </button>
+
+          {/* Modal Header Bar */}
+          <div
+            className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-black/50 pr-32 sm:pr-36 cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center gap-3">
               <span className="px-2.5 py-0.5 rounded bg-burgundy-700 text-white font-mono text-xs font-semibold">
-                Page {currentModalSlide.formattedNumber} / 23
+                Page {currentModalSlide.number} / {PART_B_SLIDES.length}
               </span>
-              <span className="font-serif text-lg font-medium text-white/95">
+              <span className="font-serif text-base sm:text-lg font-medium text-white/95 truncate max-w-[200px] sm:max-w-md">
                 Saint Roman Part B Presentation
               </span>
               <span className="text-xs text-white/50 font-mono hidden md:inline">
-                (slide-{currentModalSlide.number}.png)
+                (slide-{currentModalSlide.originalSlideNumber}.png)
               </span>
             </div>
 
@@ -265,56 +307,63 @@ export const PartBPage = () => {
               <button
                 type="button"
                 onClick={() => setZoomLevel((z) => Math.min(z + 0.25, 2.5))}
-                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
                 title="Zoom In"
+                aria-label="Zoom In"
               >
                 <ZoomIn className="w-4 h-4" />
               </button>
               <button
                 type="button"
                 onClick={() => setZoomLevel((z) => Math.max(z - 0.25, 0.75))}
-                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
                 title="Zoom Out"
+                aria-label="Zoom Out"
               >
                 <ZoomOut className="w-4 h-4" />
               </button>
               <button
                 type="button"
                 onClick={() => setZoomLevel(1)}
-                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
                 title="Reset Zoom"
+                aria-label="Reset Zoom"
               >
                 <RotateCcw className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedSlide(null);
-                  setZoomLevel(1);
-                }}
-                className="p-2 rounded-lg bg-burgundy-800 hover:bg-burgundy-700 transition-colors"
-                title="Close Lightbox"
-              >
-                <Minimize2 className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-          {/* Modal Main Stage */}
-          <div className="flex-1 relative overflow-auto p-4 flex items-center justify-center">
-            <img
-              src={currentModalSlide.src}
-              alt={currentModalSlide.alt}
-              className="max-w-none transition-transform duration-200 shadow-2xl rounded-lg"
-              style={{
-                width: `${zoomLevel * 100}%`,
-                maxWidth: zoomLevel <= 1 ? '100%' : 'none',
-              }}
-            />
+          {/* Modal Main Stage with dark overlay click-to-exit */}
+          <div
+            className="flex-1 relative overflow-auto p-4 flex items-center justify-center cursor-pointer"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                closeModal();
+              }
+            }}
+          >
+            <div
+              className="relative flex items-center justify-center cursor-default max-w-full max-h-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img
+                src={currentModalSlide.src}
+                alt={currentModalSlide.alt}
+                className="max-w-none transition-transform duration-200 shadow-2xl rounded-lg"
+                style={{
+                  width: `${zoomLevel * 100}%`,
+                  maxWidth: zoomLevel <= 1 ? '100%' : 'none',
+                }}
+              />
+            </div>
           </div>
 
           {/* Modal Footer Strip with Direct Jump */}
-          <div className="px-6 py-3 border-t border-white/10 bg-black/40 flex items-center justify-between text-xs text-white/70">
+          <div
+            className="px-6 py-3 border-t border-white/10 bg-black/50 flex items-center justify-between text-xs text-white/70 cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               type="button"
               disabled={selectedSlide <= 1}
@@ -322,23 +371,23 @@ export const PartBPage = () => {
                 setSelectedSlide((s) => Math.max(s - 1, 1));
                 setZoomLevel(1);
               }}
-              className="px-3 py-1 rounded bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer font-medium"
             >
               ← Previous Page
             </button>
 
-            <span className="font-mono">
-              Page {currentModalSlide.formattedNumber} of 23 • Zoom: {Math.round(zoomLevel * 100)}%
+            <span className="font-mono text-center">
+              Page {currentModalSlide.number} of {PART_B_SLIDES.length} • Zoom: {Math.round(zoomLevel * 100)}%
             </span>
 
             <button
               type="button"
-              disabled={selectedSlide >= 23}
+              disabled={selectedSlide >= PART_B_SLIDES.length}
               onClick={() => {
-                setSelectedSlide((s) => Math.min(s + 1, 23));
+                setSelectedSlide((s) => Math.min(s + 1, PART_B_SLIDES.length));
                 setZoomLevel(1);
               }}
-              className="px-3 py-1 rounded bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="px-3.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer font-medium"
             >
               Next Page →
             </button>

@@ -8,12 +8,12 @@ A responsive web application for the **Saint Roman** haute couture and intimate 
 
 The application is structured into two complementary portfolio presentations:
 
-### 1. **Part B — 23-Page Continuous Portfolio** (`/part-b`)
-A seamless, vertically scrollable single-column presentation of all 23 collection pages.
-- **Sequential Array-Map**: Slides 1 to 23 rendered top to bottom with responsive Tailwind styling (`max-w-5xl mx-auto py-10`).
+### 1. **Part B — 10-Page Continuous Portfolio** (`/part-b`)
+A seamless, vertically scrollable single-column presentation of 10 collection pages (filtered from `slide-14.png` through `slide-23.png`, re-indexed as Page 1 through Page 10).
+- **Sequential Array-Map**: Slides re-indexed as Page 1 to 10 rendered top to bottom with responsive Tailwind styling (`max-w-5xl mx-auto py-10`).
 - **High-Performance Lazy Loading**: Every image uses `loading="lazy"` and `decoding="async"` for fast initial page load and smooth scrolling.
-- **Interactive Lightbox & Zoom**: Fullscreen inspection with 75% to 250% zoom controls.
-- **Navigation Utilities**: Live scroll progress bar, direct "Jump to Slide" selector (1–23), and floating "Back to Top" button.
+- **Interactive Lightbox & Zoom**: Fullscreen inspection with prominent fixed Close button, backdrop click-to-exit, Escape key support, and 75% to 250% zoom controls.
+- **Navigation Utilities**: Live scroll progress bar, direct "Jump to Slide" selector (1–10), and floating "Back to Top" button.
 
 ### 2. **Part A — 5 Technical Collections** (Dedicated Routed Pages)
 1. **`/everyday-basics`** — Everyday ergonomic T-shirt bra & seamless brief set *(Maps to Page 1 / `slide-1.png`)*

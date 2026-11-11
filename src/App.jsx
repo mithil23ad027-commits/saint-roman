@@ -57,7 +57,7 @@ export function App() {
           <Route path="/full-coverage" element={<CategoryView category={cat4} />} />
           <Route path="/multiway-styling" element={<CategoryView category={cat5} />} />
 
-          {/* Part B — 23-Page Continuous Scroll Route */}
+          {/* Part B — 10-Page Continuous Scroll Route */}
           <Route path="/part-b" element={<PartBPage />} />
 
           {/* Catch-all */}

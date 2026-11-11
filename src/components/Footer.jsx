@@ -39,7 +39,7 @@ export const Footer = () => {
                   className="text-burgundy-900 font-bold hover:underline flex items-center gap-1.5"
                 >
                   <span className="font-mono text-[10px] px-1 rounded bg-burgundy-100 text-burgundy-900">NEW</span>
-                  <span>Part B (23-Page Continuous)</span>
+                  <span>Part B (10-Page Continuous)</span>
                 </Link>
               </li>
               {CATEGORIES.map((cat) => (
