@@ -27,12 +27,21 @@ export const Footer = () => {
             </div>
           </div>
 
-          {/* 5 Categories Navigation */}
+          {/* Portfolio Navigation */}
           <div className="space-y-2.5">
             <h4 className="text-xs font-mono uppercase tracking-widest text-burgundy-900 font-semibold">
-              The 5 Categories
+              Portfolio Navigation
             </h4>
             <ul className="space-y-1.5 text-xs font-sans">
+              <li className="pb-1 mb-1 border-b border-studio-200/80">
+                <Link
+                  to="/part-b"
+                  className="text-burgundy-900 font-bold hover:underline flex items-center gap-1.5"
+                >
+                  <span className="font-mono text-[10px] px-1 rounded bg-burgundy-100 text-burgundy-900">NEW</span>
+                  <span>Part B (23-Page Continuous)</span>
+                </Link>
+              </li>
               {CATEGORIES.map((cat) => (
                 <li key={cat.id}>
                   <Link
